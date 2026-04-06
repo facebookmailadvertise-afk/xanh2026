@@ -7,6 +7,7 @@ import './phone-input.css';
 const PhoneInput = ({ value, onChange, error, id, name }) => {
     const inputRef = useRef(null);
     const itiRef = useRef(null);
+    const isUpdatingRef = useRef(false);
 
     useEffect(() => {
         const inputElement = inputRef.current;
@@ -28,21 +29,35 @@ const PhoneInput = ({ value, onChange, error, id, name }) => {
                 autoPlaceholder: 'aggressive',
                 placeholderNumberType: 'MOBILE',
                 customContainer: 'w-100',
-                strictMode: false
+                strictMode: false,
+                autoHideDialCode: false
             });
 
-            const handleCountryChange = () => {
-                if (itiRef.current) {
+            const handleChange = () => {
+                if (itiRef.current && !isUpdatingRef.current) {
+                    isUpdatingRef.current = true;
                     const fullNumber = itiRef.current.getNumber();
-                    onChange(fullNumber);
+                    const selectedCountryData = itiRef.current.getSelectedCountryData();
+                    const dialCode = selectedCountryData.dialCode;
+                    
+                    if (fullNumber) {
+                        onChange(fullNumber);
+                    } else if (inputElement.value && dialCode) {
+                        onChange(`+${dialCode}${inputElement.value.replace(/\D/g, '')}`);
+                    } else {
+                        onChange(inputElement.value);
+                    }
+                    isUpdatingRef.current = false;
                 }
             };
 
-            inputElement.addEventListener('countrychange', handleCountryChange);
+            inputElement.addEventListener('input', handleChange);
+            inputElement.addEventListener('countrychange', handleChange);
 
             return () => {
                 if (inputElement) {
-                    inputElement.removeEventListener('countrychange', handleCountryChange);
+                    inputElement.removeEventListener('input', handleChange);
+                    inputElement.removeEventListener('countrychange', handleChange);
                 }
                 if (itiRef.current) {
                     itiRef.current.destroy();
@@ -52,15 +67,13 @@ const PhoneInput = ({ value, onChange, error, id, name }) => {
         }
     }, [onChange]);
 
-    const handleInputChange = (e) => {
-        const inputValue = e.target.value;
-        if (itiRef.current) {
-            const fullNumber = itiRef.current.getNumber();
-            onChange(fullNumber || inputValue);
-        } else {
-            onChange(inputValue);
+    useEffect(() => {
+        if (itiRef.current && value && !isUpdatingRef.current) {
+            isUpdatingRef.current = true;
+            itiRef.current.setNumber(value);
+            isUpdatingRef.current = false;
         }
-    };
+    }, [value]);
 
     return (
         <div className="intl-tel-input-wrapper">
@@ -70,8 +83,6 @@ const PhoneInput = ({ value, onChange, error, id, name }) => {
                 id={id}
                 name={name}
                 className={`form-control ${error ? 'is-invalid' : ''}`}
-                value={value}
-                onChange={handleInputChange}
                 required
             />
         </div>
